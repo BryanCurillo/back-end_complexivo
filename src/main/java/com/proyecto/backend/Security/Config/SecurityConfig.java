@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,6 +37,9 @@ public class SecurityConfig {
                         csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
+                                // Permitir preflight (CORS)
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                // Endpoints públicos
                                 .requestMatchers("/app/auth/**").permitAll()
                                 .requestMatchers("/app/personas/auth/**").permitAll()
 //                                .requestMatchers("/app/usuario/admin/**").hasRole("ADMIN")
@@ -57,7 +61,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));//
+//        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:4200"));
+
         configuration.setAllowedMethods(List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Message");
